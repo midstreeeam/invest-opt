@@ -1,7 +1,8 @@
 from multiprocessing import Pool, cpu_count
+from typing import Tuple
 
 import numpy as np
-
+from tqdm import tqdm
 
 def cumulative_n_period_returns(traces, period_bars):
     assert traces.shape[1] % period_bars == 0
@@ -12,7 +13,7 @@ def cumulative_n_period_returns(traces, period_bars):
     return np.cumprod(result, axis=-1) - 1
 
 
-def _weighted_returns_pmf(returns : np.ndarray, bins : int = 1000) -> (np.ndarray, np.ndarray):
+def _weighted_returns_pmf(returns : np.ndarray, bins : int = 1000) -> Tuple(np.ndarray, np.ndarray):
     hist, bins = np.histogram(returns, bins=bins, density=True)
 
     return (
@@ -53,10 +54,12 @@ def mcmc_sample_returns(returns : np.ndarray, n_bars : int, n_traces : int = 100
 
     # Build transition matrix
     P = np.zeros((mc_states, mc_states), dtype=np.float32)
-    for i in range(len(returns) - 1):
-        curr_state_idx = int(np.floor((returns[i] - ret_min) / bin_size))
-        next_state_idx = int(np.floor((returns[i+1] - ret_min) / bin_size))
-        P[curr_state_idx, next_state_idx] += 1
+    with tqdm(total=len(returns)) as bar:
+        for i in range(len(returns) - 1):
+            curr_state_idx = int(np.floor((returns[i] - ret_min) / bin_size))
+            next_state_idx = int(np.floor((returns[i+1] - ret_min) / bin_size))
+            P[curr_state_idx, next_state_idx] += 1
+            bar.update()
 
     P /= np.sum(P, -1, keepdims=True)
     if np.any(np.isnan(P)):
