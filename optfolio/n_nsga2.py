@@ -102,24 +102,42 @@ def _tournament_is_better(a_front: int, a_crowd: int, b_front: int, b_crowd: int
 
     return (a_front < b_front) or ((a_front == b_front) and (a_crowd < b_crowd))
 
+# @nb.jit(nopython=True)
+def tournament_selection(fronts: np.ndarray, crowding_distances: np.ndarray, k: int = 50, b: float = 0.5) -> Tuple[int, int]:
+    """
+    Perform tournament selection to choose two parent solutions for crossover.
 
-@nb.jit(nopython=True)
-def tournament_selection(fronts: np.ndarray, crowding_distances: np.ndarray, k: int = 50) -> Tuple[int, int]:
+    Parameters:
+    - fronts (np.ndarray): Array of front assignments for each solution.
+    - crowding_distances (np.ndarray): Array of crowding distances for each solution.
+    - k (int, optional): Number of candidates to consider in the tournament. Default is 50.
+    - b (float, optional): Bias towards selecting candidates with larger crowding distances. Ranges from 0.0 to 1.0.
 
-    # Normalize crowding distances
-    total = np.sum(crowding_distances)
-    normalized_distances = crowding_distances / total
+    Returns:
+    - Tuple[int, int]: Indices of the two selected parent solutions.
+    """
     
-    # Compute cumulative weights
-    cum_weights = np.zeros_like(normalized_distances)
-    cum_weights[0] = normalized_distances[0]
-    for i in range(1, len(normalized_distances)):
-        cum_weights[i] = cum_weights[i-1] + normalized_distances[i]
-
+    # Ensure all crowding distances are non-negative and not NaN
+    crowding_distances = np.maximum(crowding_distances, 0)
+    crowding_distances = np.nan_to_num(crowding_distances)
+    
+    # Bias the selection based on crowding distances
+    biased_probs = crowding_distances ** b
+    biased_probs = np.nan_to_num(biased_probs)
+    
+    total = np.sum(biased_probs)
+    
+    # Avoid division by zero and NaN
+    if total == 0 or np.isnan(total):
+        probabilities = np.ones_like(crowding_distances) / len(crowding_distances)
+    else:
+        probabilities = biased_probs / total
+        probabilities = np.nan_to_num(probabilities)
+    
+    candidate_ids = np.random.choice(len(fronts), size=(k, 2), p=probabilities, replace=False)
     best_i, best_j = -1, -1
     for idx in range(k):
-        i = select_index_by_weight(cum_weights)
-        j = select_index_by_weight(cum_weights)
+        i, j = candidate_ids[idx, :]
         if best_i < 0:
             best_i = i
             best_j = j

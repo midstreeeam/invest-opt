@@ -52,7 +52,7 @@ optimizer = Opt2(
     mutation_sigma=1.0, 
     verbose=True, 
     max_iter=250, 
-    population_size=3000
+    population_size=4000
 )
 
 # solutions, stats = optimizer.run(train.values)
