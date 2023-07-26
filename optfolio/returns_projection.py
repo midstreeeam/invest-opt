@@ -6,6 +6,17 @@ from tqdm import tqdm
 
 
 def cumulative_n_period_returns(traces, period_bars):
+    """
+    Calculate the cumulative returns for given periods.
+
+    Parameters:
+    - traces: np.ndarray containing return values.
+    - period_bars: int denoting the period for which cumulative returns are to be computed.
+
+    Returns:
+    - np.ndarray: Array of cumulative returns.
+    """
+
     assert traces.shape[1] % period_bars == 0
     n_periods = int(traces.shape[1] / period_bars)
 
@@ -14,7 +25,18 @@ def cumulative_n_period_returns(traces, period_bars):
     return np.cumprod(result, axis=-1) - 1
 
 
-def _weighted_returns_pmf(returns: np.ndarray, bins: int = 1000) -> Tuple(np.ndarray, np.ndarray):
+def _weighted_returns_pmf(returns: np.ndarray, bins: int = 1000) -> Tuple[np.ndarray, np.ndarray]:
+    """
+    Calculate the probability mass function for weighted returns.
+
+    Parameters:
+    - returns: np.ndarray containing return values.
+    - bins: int specifying the number of histogram bins.
+
+    Returns:
+    - Tuple: Probability mass function values and corresponding bin edges.
+    """
+    
     hist, bins = np.histogram(returns, bins=bins, density=True)
 
     return (
@@ -24,6 +46,19 @@ def _weighted_returns_pmf(returns: np.ndarray, bins: int = 1000) -> Tuple(np.nda
 
 
 def sample_returns(returns: np.ndarray, n_bars: int, n_traces: int = 10000, pdf_bins: int = 1000) -> np.ndarray:
+    """
+    Sample return values from given data.
+
+    Parameters:
+    - returns: np.ndarray containing return values.
+    - n_bars: int specifying the number of bars to sample.
+    - n_traces: int specifying the number of traces to sample.
+    - pdf_bins: int specifying the number of histogram bins.
+
+    Returns:
+    - np.ndarray: Sampled returns.
+    """
+    
     period_returns_p, period_returns = _weighted_returns_pmf(
         returns, bins=pdf_bins)
 
@@ -31,6 +66,18 @@ def sample_returns(returns: np.ndarray, n_bars: int, n_traces: int = 10000, pdf_
 
 
 def _mcmc_trace(P: np.ndarray, returns: np.ndarray, ret_min: float, ret_max: float, n_traces: int, n_bars: int) -> np.ndarray:
+    """
+    Helper function for MCMC sampling of returns.
+
+    Parameters:
+    - P: Transition matrix.
+    - returns, ret_min, ret_max: Information about returns.
+    - n_traces, n_bars: Sampling parameters.
+
+    Returns:
+    - np.ndarray: MCMC sampled returns.
+    """
+    
     ret_range = ret_max - ret_min
     bin_size = ret_range / P.shape[0]
 
@@ -50,6 +97,20 @@ def _mcmc_trace(P: np.ndarray, returns: np.ndarray, ret_min: float, ret_max: flo
 
 
 def mcmc_sample_returns(returns: np.ndarray, n_bars: int, n_traces: int = 1000, mc_states: int = 10, n_jobs: int = -1) -> np.ndarray:
+    """
+    Perform MCMC sampling for return values.
+
+    Parameters:
+    - returns: np.ndarray containing return values.
+    - n_bars: int specifying the number of bars to sample.
+    - n_traces: int specifying the number of traces to sample.
+    - mc_states: int specifying the number of Markov Chain states.
+    - n_jobs: int specifying the number of parallel jobs. If -1, use all available CPUs.
+
+    Returns:
+    - np.ndarray: MCMC sampled returns.
+    """
+    
     ret_min, ret_max = np.min(returns), np.max(returns) + 1e-4
     ret_range = ret_max - ret_min
     bin_size = ret_range / mc_states

@@ -1,2 +1,3 @@
 YEAR_BARS : int = 252
 MONTH_BARS : int = YEAR_BARS / 12
+HV_REFERENCE = (-1,0)
