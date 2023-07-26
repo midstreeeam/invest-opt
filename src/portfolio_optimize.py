@@ -4,7 +4,8 @@ sys.path.append("..")
 
 from optfolio.report import plot_traces, returns_table
 from optfolio.returns_projection import cumulative_n_period_returns, sample_returns, mcmc_sample_returns
-from optfolio.optimize import Optimizer,hypervolume
+from optfolio.optimize import Optimizer as Opt1
+from optfolio.optimize2 import Optimizer as Opt2
 import matplotlib.pyplot as plt
 from datetime import timedelta, datetime
 
@@ -47,16 +48,17 @@ spy_test = spy_daily_returns[(spy_daily_returns.index >= TRAIN_END_DATE)].fillna
 # # plot rand preformance
 # plot_random_preformance(train)
 
-optimizer = Optimizer(
+optimizer = Opt2(
     mutation_sigma=1.0, 
-    verbose=False, 
-    max_iter=2, 
-    population_size=5000
+    verbose=True, 
+    max_iter=250, 
+    population_size=3000
 )
 
-solutions, stats = optimizer.run(train.values)
+# solutions, stats = optimizer.run(train.values)
+solutions, stats = gen_gif(train,optimizer)
+plot_hv(stats)
 
-# gen_gif(train,optimizer)
 # plot_solutions(train, solutions)
 
 
@@ -86,27 +88,24 @@ solutions, stats = optimizer.run(train.values)
 # plt.show()
 
 
-"""### S&P 500 MC Projection"""
-
-print("Annualized return: %.6f" % (np.mean(spy_train + 1) ** 252 - 1))
-print("Annualized volatility: %.6f" % (np.sqrt(np.var(spy_train) * 252)))
+# """### S&P 500 MC Projection"""
+# print("Annualized return: %.6f" % (np.mean(spy_train + 1) ** 252 - 1))
+# print("Annualized volatility: %.6f" % (np.sqrt(np.var(spy_train) * 252)))
 
 # spy_traces = sample_returns(spy_train, 10 * 252, n_traces=100000)
 
 # spy_cum_returns = plot_traces(spy_traces)
 # returns_table(spy_cum_returns)
 
-# """### MC Projection"""
 
+# """### MC Projection"""
 # traces = sample_returns(ret, 10 * 252, n_traces=100000)
 
 # cum_returns = plot_traces(traces)
 # returns_table(cum_returns)
 
+
 # """### MCMC Projection"""
-
-# mcmc_traces = mcmc_sample_returns(
-#     ret, 10 * 252, n_traces=100000, mc_states=10, n_jobs=10)
-
+# mcmc_traces = mcmc_sample_returns(ret, 10 * 252, n_traces=100000, mc_states=10, n_jobs=10)
 # mcmc_cum_returns = plot_traces(mcmc_traces)
 # returns_table(mcmc_cum_returns)

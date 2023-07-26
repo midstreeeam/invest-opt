@@ -78,27 +78,33 @@ def annualized_portfolio_performance(returns, weights):
     ], -1)
 
 
-def gen_gif(train,optimizer):
-    def plot_solutions(data, solutions, rand_solutions, filename):
+def gen_gif(train, optimizer):
+    def plot_solutions(data, solutions, other_solutions, rand_solutions, filename, generation):
         ov = annualized_portfolio_performance(data, solutions)
-        plt.figure(figsize=(20, 10))
+        ov_other = annualized_portfolio_performance(data, other_solutions)
+        plt.figure()
         plt.title('Solutions')
-        plt.scatter(rand_solutions[:, 1], rand_solutions[:, 0], alpha=.2)
-        plt.scatter(ov[:, 1], ov[:, 0], alpha=.5, color='red')
+        plt.scatter(rand_solutions[:, 1], rand_solutions[:, 0], alpha=.1)
+        plt.scatter(ov_other[:, 1], ov_other[:, 0], alpha=.5, color='orange')
+        plt.scatter(ov[:, 1], ov[:, 0], alpha=.8, color='red')
         plt.xlabel('Volatility')
         plt.ylabel('Return')
+        
+        # Add generation number to the top right corner
+        plt.text(0.85, 0.95, f'Gen: {generation}', transform=plt.gca().transAxes)
+        
         plt.savefig(filename)
         plt.close()
 
     image_files = []
     rand_weights = random_population(train.shape[1], 100000)
     rand_solutions = annualized_portfolio_performance(train, rand_weights)
-    for idx, (solutions, stats) in enumerate(optimizer.run_generator(train.values)):
+    for idx, (solutions, others, stats) in enumerate(optimizer.run_generator(train.values)):
         filename = f"pareto_front_{idx}.png"
-        plot_solutions(train, solutions, rand_solutions, filename)
+        plot_solutions(train, solutions, others, rand_solutions, filename, idx)
         image_files.append(filename)
 
-    with imageio.get_writer('pareto_evolution.gif', mode='I', duration=0.5) as writer:
+    with imageio.get_writer('pareto_evolution.gif', mode='I', duration=0.025) as writer:
         for filename in image_files:
             image = imageio.imread(filename)
             writer.append_data(image)
@@ -106,3 +112,16 @@ def gen_gif(train,optimizer):
     # Optionally, remove the individual image files to clean up
     for filename in image_files:
         os.remove(filename)
+    
+    return solutions, stats
+
+
+def plot_hv(stats):
+    hypervolume_values = stats['hv']
+    plt.figure()
+    plt.plot(hypervolume_values)
+    plt.title('Hypervolume across iterations')
+    plt.xlabel('Generation')
+    plt.ylabel('Hypervolume')
+    plt.grid(True)
+    plt.show()

@@ -2,8 +2,6 @@ import time
 from typing import Tuple
 
 import numpy as np
-from deap.tools.indicator import hypervolume
-from deap import base, creator
 
 from optfolio.objectives import *
 from optfolio.nsga2 import *
@@ -32,7 +30,6 @@ class Optimizer:
             'return': {'min': [], 'max': [], 'avg': []},
             'volatility': {'min': [], 'max': [], 'avg': []},
             'constraints_violation': {'min': [], 'max': [], 'avg': []},
-            'sharpe_ratio': {'min': [], 'max': [], 'avg': []},
             'hv': [],
             'time_per_generation': []
         }
@@ -180,16 +177,21 @@ class Optimizer:
                                constraints_val[fronts == 0], hv, float(time.time() - gen_start_time))
                       
             if self._verbose:
-                print('Generation: %d, Time: %.2f, N pareto solutions: %d, Hypervolume: %.5f' % (
-                    gen_idx, stats['time_per_generation'], np.sum(fronts == 0), hv
-                ))
+                print(
+                    f"===============\n"
+                    f"Generation: {gen_idx},\n"
+                    f"Time: {stats['time_per_generation'][-1]:.2f}, \n"
+                    f"N pareto solutions: {np.sum(fronts == 0)}, \n"
+                    f"Hypervolume: {hv}\n"
+                )
                 
             # Yield the current Pareto front solutions
             pareto_front_ids = np.argwhere(fronts == 0).reshape((-1,))
-            yield population[pareto_front_ids], stats
+            other_ids = np.argwhere(fronts != 0).reshape((-1,))
+            yield population[pareto_front_ids], population[other_ids], stats
 
         pareto_front_ids = np.argwhere(fronts == 0).reshape((-1,))
-        return population[pareto_front_ids], stats
+        return population[pareto_front_ids], population[other_ids], stats
 
 
 def hypervolume(pareto_front, reference_point = HV_REFERENCE):
@@ -216,9 +218,6 @@ def hypervolume(pareto_front, reference_point = HV_REFERENCE):
             width = reference_point[0] - sorted_front[i][0]
         else:
             width = sorted_front[i - 1][0] - sorted_front[i][0]
-        
         height = reference_point[1] - sorted_front[i][1]
-        
         hv += width * height
-    
     return hv
