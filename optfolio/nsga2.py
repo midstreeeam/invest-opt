@@ -6,7 +6,19 @@ from optfolio.utils import is_close_to_zero
 
 
 @nb.jit(nopython=True)
-def non_dominated_fronts(return_obj: np.ndarray, volatility_obj: np.ndarray, constraints_val: np.ndarray) -> Tuple(np.ndarray, np.ndarray):
+def non_dominated_fronts(return_obj: np.ndarray, volatility_obj: np.ndarray, constraints_val: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
+    """
+    Compute the non-dominated fronts and crowding distances for a given population.
+
+    Parameters:
+    - return_obj (np.ndarray): Array of annualized returns for each solution.
+    - volatility_obj (np.ndarray): Array of annualized volatilities for each solution.
+    - constraints_val (np.ndarray): Array of constraint violation values for each solution.
+
+    Returns:
+    - Tuple[np.ndarray, np.ndarray]: Arrays representing the front assignments and crowding distances for each solution.
+    """
+
     domination_counts = np.zeros(len(return_obj), dtype=np.int32)
     domination_ids = []
 
@@ -50,6 +62,17 @@ def non_dominated_fronts(return_obj: np.ndarray, volatility_obj: np.ndarray, con
 
 @nb.jit(nopython=True)
 def _crowding_distance(return_obj: np.ndarray, volatility_obj: np.ndarray) -> np.ndarray:
+    """
+    Compute the crowding distance for a set of solutions based on their objectives.
+
+    Parameters:
+    - return_obj (np.ndarray): Array of annualized returns for each solution.
+    - volatility_obj (np.ndarray): Array of annualized volatilities for each solution.
+
+    Returns:
+    - np.ndarray: Array of crowding distances for each solution.
+    """
+
     # Using Improved Crowding Distance formula (2) from https://arxiv.org/pdf/1811.12667.pdf
     distances = np.zeros(len(return_obj), dtype=np.float32)
     for objective_values, mul in [(return_obj, -1), (volatility_obj, 1)]:
@@ -64,11 +87,36 @@ def _crowding_distance(return_obj: np.ndarray, volatility_obj: np.ndarray) -> np
 
 @nb.jit(nopython=True)
 def _tournament_is_better(a_front: int, a_crowd: int, b_front: int, b_crowd: int) -> bool:
+    """
+    Determine if one solution is better than another based on their front and crowding distance.
+
+    Parameters:
+    - a_front (int): Front assignment of the first solution.
+    - a_crowd (int): Crowding distance of the first solution.
+    - b_front (int): Front assignment of the second solution.
+    - b_crowd (int): Crowding distance of the second solution.
+
+    Returns:
+    - bool: True if the first solution is better, False otherwise.
+    """
+
     return (a_front < b_front) or ((a_front == b_front) and (a_crowd < b_crowd))
 
 
 @nb.jit(nopython=True)
-def tournament_selection(fronts: np.ndarray, crowding_distances: np.ndarray, k: int = 50) -> Tuple(int, int):
+def tournament_selection(fronts: np.ndarray, crowding_distances: np.ndarray, k: int = 50) -> Tuple[int, int]:
+    """
+    Perform tournament selection to choose two parent solutions for crossover.
+
+    Parameters:
+    - fronts (np.ndarray): Array of front assignments for each solution.
+    - crowding_distances (np.ndarray): Array of crowding distances for each solution.
+    - k (int, optional): Number of candidates to consider in the tournament. Default is 50.
+
+    Returns:
+    - Tuple[int, int]: Indices of the two selected parent solutions.
+    """
+    
     candidate_ids = np.random.choice(len(fronts), size=(k, 2), replace=False)
     best_i, best_j = -1, -1
     for idx in range(k):
@@ -93,7 +141,22 @@ def select_top_individuals(
     return_obj: np.ndarray,
     volatility_obj: np.ndarray,
     constraints_val: np.ndarray
-) -> Tuple(np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray):
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    """
+    Select the top individuals from a population based on non-domination and crowding distance.
+
+    Parameters:
+    - population (np.ndarray): The current population of solutions.
+    - fronts (np.ndarray): Array of front assignments for each solution.
+    - crowding_distances (np.ndarray): Array of crowding distances for each solution.
+    - return_obj (np.ndarray): Array of annualized returns for each solution.
+    - volatility_obj (np.ndarray): Array of annualized volatilities for each solution.
+    - constraints_val (np.ndarray): Array of constraint violation values for each solution.
+
+    Returns:
+    - Tuple[np.ndarray, ...]: Arrays representing the new population, their front assignments, crowding distances, and objective values.
+    """
+    
     target_size = int(population.shape[0] / 2)
     added_individuals_count = 0
     front_id = 0
@@ -129,6 +192,17 @@ def select_top_individuals(
 
 @nb.jit(nopython=True)
 def flat_crossover(p1: np.ndarray, p2: np.ndarray) -> np.ndarray:
+    """
+    Perform flat crossover between two parent solutions.
+
+    Parameters:
+    - p1 (np.ndarray): The first parent solution.
+    - p2 (np.ndarray): The second parent solution.
+
+    Returns:
+    - np.ndarray: The offspring solution.
+    """
+    
     g = np.stack((p1, p2))
     hc_lb, hc_ub = np.empty_like(p1), np.empty_like(p2)
     for i in range(len(p1)):
@@ -141,4 +215,15 @@ def flat_crossover(p1: np.ndarray, p2: np.ndarray) -> np.ndarray:
 
 @nb.jit(nopython=True)
 def gaussian_mutation(x: np.ndarray, sigma: float = 1) -> np.ndarray:
+    """
+    Apply Gaussian mutation to a solution.
+
+    Parameters:
+    - x (np.ndarray): The original solution.
+    - sigma (float, optional): The standard deviation of the Gaussian distribution used for mutation. Default is 1.
+
+    Returns:
+    - np.ndarray: The mutated solution.
+    """
+
     return x + np.random.normal(0, sigma, size=x.shape)
