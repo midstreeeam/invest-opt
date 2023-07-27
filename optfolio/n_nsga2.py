@@ -157,7 +157,8 @@ def select_top_individuals(
     crowding_distances: np.ndarray,
     return_obj: np.ndarray,
     volatility_obj: np.ndarray,
-    constraints_val: np.ndarray
+    constraints_val: np.ndarray,
+    target_scaler: int = 2
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """
     Select the top individuals from a population based on non-domination and crowding distance.
@@ -174,7 +175,7 @@ def select_top_individuals(
     - Tuple[np.ndarray, ...]: Arrays representing the new population, their front assignments, crowding distances, and objective values.
     """
     
-    target_size = int(population.shape[0] / 2)
+    target_size = int(population.shape[0] / target_scaler)
     added_individuals_count = 0
     front_id = 0
 

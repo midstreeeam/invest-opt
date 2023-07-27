@@ -24,7 +24,8 @@ class Optimizer:
         self._mutation_p_decay = mutation_p_decay
         self._mutation_sigma = mutation_sigma
         self._verbose = verbose
-
+        self.filename = f"{population_size}"
+    
     def run(self, returns: np.ndarray, max_allocation: float = None) -> Tuple[np.ndarray, dict]:
         stats = {
             'return': {'min': [], 'max': [], 'avg': []},
@@ -189,6 +190,10 @@ class Optimizer:
             pareto_front_ids = np.argwhere(fronts == 0).reshape((-1,))
             other_ids = np.argwhere(fronts != 0).reshape((-1,))
             yield population[pareto_front_ids], population[other_ids], stats
+
+            # early stop
+            if len(fronts[fronts==0]) >= len(population)/4:
+                break
 
         pareto_front_ids = np.argwhere(fronts == 0).reshape((-1,))
         return population[pareto_front_ids], population[other_ids], stats

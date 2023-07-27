@@ -1,3 +1,4 @@
+import json
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -7,6 +8,7 @@ import imageio
 
 
 from optfolio import YEAR_BARS
+FILE_PATH = '../.data/'
 
 def plot_all_stock_daily_return(daily_returns):
     n_rows = int(np.ceil(daily_returns.shape[1] / 2.0))
@@ -78,7 +80,7 @@ def annualized_portfolio_performance(returns, weights):
     ], -1)
 
 
-def gen_gif(train, optimizer):
+def log_opt(train, optimizer):
     def plot_solutions(data, solutions, other_solutions, rand_solutions, filename, generation):
         ov = annualized_portfolio_performance(data, solutions)
         ov_other = annualized_portfolio_performance(data, other_solutions)
@@ -96,6 +98,8 @@ def gen_gif(train, optimizer):
         plt.savefig(filename)
         plt.close()
 
+    stats_log = {}
+
     image_files = []
     rand_weights = random_population(train.shape[1], 100000)
     rand_solutions = annualized_portfolio_performance(train, rand_weights)
@@ -103,11 +107,17 @@ def gen_gif(train, optimizer):
         filename = f"pareto_front_{idx}.png"
         plot_solutions(train, solutions, others, rand_solutions, filename, idx)
         image_files.append(filename)
+        stats_log = {"stats": stats, "solutions": solutions.tolist()}
+        gif_name = f"{FILE_PATH+optimizer.filename}_{idx+1}iter.gif"
+        log_name = f"{FILE_PATH+optimizer.filename}_{idx+1}iter.json"
 
-    with imageio.get_writer('pareto_evolution.gif', mode='I', duration=0.025) as writer:
+    with imageio.get_writer(gif_name, mode='I', duration=0.025) as writer:
         for filename in image_files:
             image = imageio.imread(filename)
             writer.append_data(image)
+    
+    with open(log_name,'w',encoding='utf8') as f:
+        f.write(json.dumps(stats_log))
 
     # Optionally, remove the individual image files to clean up
     for filename in image_files:
