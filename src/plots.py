@@ -135,3 +135,49 @@ def plot_hv(stats):
     plt.ylabel('Hypervolume')
     plt.grid(True)
     plt.show()
+
+
+def compare_hvs(stats_lst, labels=None):
+    plt.figure()
+    plt.title('Hypervolume across iterations')
+    plt.xlabel('Generation')
+    plt.ylabel('Hypervolume')
+    
+    # Default color cycle
+    colors = plt.cm.jet(np.linspace(0, 1, len(stats_lst)))
+    
+    if labels is None:
+        labels = [f'Stats {i}' for i in range(len(stats_lst))]
+    
+    for idx, stats in enumerate(stats_lst):
+        hv = stats['hv']
+        plt.plot(hv, color=colors[idx], label=labels[idx])
+    
+    plt.grid(True)
+    plt.legend()
+    plt.show()
+
+def compare_solutions(solutions_lst, labels=None):
+    plt.figure()
+    plt.title('Solutions')
+    
+    # Default color cycle
+    colors = plt.cm.jet(np.linspace(0, 1, len(solutions_lst)))
+    
+    if labels is None:
+        labels = [f'Solution {i}' for i in range(len(solutions_lst))]
+    
+    for idx, solutions in enumerate(solutions_lst):
+        plt.scatter(solutions[:, 1], solutions[:, 0], color=colors[idx], label=labels[idx], alpha=.5)
+    
+    plt.legend()
+    plt.xlabel('Volatility')
+    plt.ylabel('Return')
+    plt.show()
+
+
+def read_log(path):
+    with open(path, 'r', encoding='utf8') as f:
+        data = f.read()
+        log_dict = json.loads(data)
+    return log_dict['stats'], log_dict['solutions']

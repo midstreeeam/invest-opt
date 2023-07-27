@@ -48,22 +48,22 @@ spy_test = spy_daily_returns[(spy_daily_returns.index >= TRAIN_END_DATE)].fillna
 # # plot rand preformance
 # plot_random_preformance(train)
 
-# optimizer = Opt2(
+optimizer = Opt2(
+    mutation_sigma=1.0, 
+    verbose=True, 
+    max_iter=500,
+    population_size=3000,
+    mutation_p_decay=0.995,
+    opt=True
+)
+
+# optimizer = Opt1(
 #     mutation_sigma=1.0, 
 #     verbose=True, 
 #     max_iter=500,
 #     population_size=3000,
 #     mutation_p_decay=0.995,
-#     opt=False
 # )
-
-optimizer = Opt1(
-    mutation_sigma=1.0, 
-    verbose=True, 
-    max_iter=5,
-    population_size=3000,
-    mutation_p_decay=0.995,
-)
 
 # solutions, stats = optimizer.run(train.values)
 solutions, stats = log_opt(train,optimizer)
