@@ -18,7 +18,7 @@ class Optimizer:
             mutation_sigma: float = 0.1, 
             verbose: bool = False,
             opt: bool = True,
-            init_boost_scaler: int = 12
+            init_boost_scaler: int = 15
     ):
         self._population_size = population_size
         self._max_iter = max_iter

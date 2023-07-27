@@ -157,7 +157,7 @@ def compare_hvs(stats_lst, labels=None):
     plt.legend()
     plt.show()
 
-def compare_solutions(solutions_lst, labels=None):
+def compare_solutions(solutions_lst, train, labels=None):
     plt.figure()
     plt.title('Solutions')
     
@@ -168,6 +168,7 @@ def compare_solutions(solutions_lst, labels=None):
         labels = [f'Solution {i}' for i in range(len(solutions_lst))]
     
     for idx, solutions in enumerate(solutions_lst):
+        solutions = annualized_portfolio_performance(train,np.array(solutions))
         plt.scatter(solutions[:, 1], solutions[:, 0], color=colors[idx], label=labels[idx], alpha=.5)
     
     plt.legend()

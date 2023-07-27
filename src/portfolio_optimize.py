@@ -48,32 +48,47 @@ spy_test = spy_daily_returns[(spy_daily_returns.index >= TRAIN_END_DATE)].fillna
 # # plot rand preformance
 # plot_random_preformance(train)
 
-optimizer = Opt2(
-    mutation_sigma=1.0, 
-    verbose=True, 
-    max_iter=500,
-    population_size=3000,
-    mutation_p_decay=0.995,
-    opt=True
-)
+compare_files = [
+    # '../.data/3000_331iter.json',
+    # '../.data/3000_355iter.json',
+    # '../.data/3000_362iter.json',
+    # '../.data/3000_opt_374iter.json',
+    # '../.data/3000_opt_416iter.json',
+    # '../.data/3000_opt_468iter.json',
+    '../.data/3000_opt2_387iter.json',
+    '../.data/3000_opt2_411iter.json',
+    '../.data/3000_opt2_456iter.json',
+]
 
-# optimizer = Opt1(
-#     mutation_sigma=1.0, 
-#     verbose=True, 
-#     max_iter=500,
-#     population_size=3000,
-#     mutation_p_decay=0.995,
-# )
+stats_lst, solutions_lst = zip(*[read_log(file) for file in compare_files])
 
-# solutions, stats = optimizer.run(train.values)
-solutions, stats = log_opt(train,optimizer)
+compare_hvs(stats_lst)
+compare_solutions(solutions_lst,train)
 
-# for solutions, others, stats in optimizer.run_generator(train.values):
-#     pass
+# for i in range(2):
+#     optimizer = Opt2(
+#         mutation_sigma=1.0, 
+#         verbose=True, 
+#         max_iter=500,
+#         population_size=3000,
+#         mutation_p_decay=0.995,
+#         opt=True
+#     )
 
-plot_hv(stats)
+#     # optimizer = Opt1(
+#     #     mutation_sigma=1.0, 
+#     #     verbose=True, 
+#     #     max_iter=500,
+#     #     population_size=3000,
+#     #     mutation_p_decay=0.995,
+#     # )
 
-# plot_solutions(train, solutions)
+#     # solutions, stats = optimizer.run(train.values)
+#     solutions, stats = log_opt(train,optimizer)
+
+#     # plot_hv(stats)
+
+#     # plot_solutions(train, solutions)
 
 
 
