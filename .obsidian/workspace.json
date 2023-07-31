@@ -1,0 +1,167 @@
+{
+  "main": {
+    "id": "551495a4b3bd322b",
+    "type": "split",
+    "children": [
+      {
+        "id": "4419445d010e8301",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "d9f5935a88dd62ba",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "note.md",
+                "mode": "source",
+                "source": false
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "1fedec80662f5a4b",
+    "type": "split",
+    "children": [
+      {
+        "id": "edf7c7372d9bd19c",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "ae84315bfa23a30c",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical"
+              }
+            }
+          },
+          {
+            "id": "df6fc285393db2bd",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              }
+            }
+          },
+          {
+            "id": "8c722e6d9c0b8403",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {}
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 219.5
+  },
+  "right": {
+    "id": "47b1da6859d118c8",
+    "type": "split",
+    "children": [
+      {
+        "id": "e0df272cc8a30456",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "fc33c6e00d48809e",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "note.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              }
+            }
+          },
+          {
+            "id": "17cb3c1eb118ab31",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "note.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              }
+            }
+          },
+          {
+            "id": "666f1c7cebbc93e3",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true
+              }
+            }
+          },
+          {
+            "id": "bcd44a8baa19ba5e",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "note.md"
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false
+    }
+  },
+  "active": "d9f5935a88dd62ba",
+  "lastOpenFiles": [
+    "README.md",
+    "note.md",
+    "img/comp_sharpe.png",
+    "img/comp_solution.png",
+    "img/comp_hv.png",
+    "img/init2.png",
+    "img/init1.png",
+    "Untitled 1.md",
+    "Untitled.md",
+    "img/dist2.png",
+    "img/random_solutions.png",
+    "img/dist1.png",
+    "img/dist3.png",
+    "src/pareto_front_402.png",
+    "img"
+  ]
+}
