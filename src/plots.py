@@ -43,7 +43,7 @@ def plot_stocks_corr_heat(daily_returns):
 
 def plot_random_preformance(train):
     # random port weights
-    rand_weights = random_population(train.shape[1], 100000)
+    rand_weights = random_population(train.shape[1], 1000)
     rand_solutions = annualized_portfolio_performance(train, rand_weights)
     plt.figure()
     plt.title('Random portfolios')

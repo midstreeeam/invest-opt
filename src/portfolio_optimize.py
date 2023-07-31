@@ -45,11 +45,11 @@ test = daily_returns[(daily_returns.index >= TRAIN_END_DATE)].fillna(0)
 spy_train = spy_daily_returns[(spy_daily_returns.index < TRAIN_END_DATE)].fillna(0)
 spy_test = spy_daily_returns[(spy_daily_returns.index >= TRAIN_END_DATE)].fillna(0)
 
-# # plot rand preformance
+# plot rand preformance
 # plot_random_preformance(train)
 
 compare_files = [
-    '../.data/3000_331iter.json',
+    '../.data/3000_403iter.json',
     # '../.data/3000_355iter.json',
     # '../.data/3000_362iter.json',
     # '../.data/3000_opt_374iter.json',
@@ -62,24 +62,24 @@ compare_files = [
 
 stats_lst, solutions_lst = zip(*[read_log(file) for file in compare_files])
 
-labels = ['nsga-ii', 'select_opt', 'select_opt+dyn_mut+dyn_pop']
+labels = ['nsga-ii', 'select_opt', 'select_opt+dyn_mut+init_opt']
 args = {
     'solutions_lst': solutions_lst,
     'train': train,
     'labels': labels
 }
 
-# add the '__main__' guard for multi-processing
-if __name__ == '__main__':
-    run_mcmc(**args)
+# # add the '__main__' guard for multi-processing
+# if __name__ == '__main__':
+#     run_mcmc(**args)
 
-# compare_hvs(stats_lst)
-# compare_solutions(**args)
-# compare_sharpe(**args)
-# compare_density(**args)
+compare_hvs(stats_lst,labels)
+compare_solutions(**args)
+compare_sharpe(**args)
+compare_density(**args)
 
 
-# for i in range(2):
+# for i in range(1):
 #     optimizer = Opt2(
 #         mutation_sigma=1.0, 
 #         verbose=True, 
@@ -89,15 +89,14 @@ if __name__ == '__main__':
 #         opt=True
 #     )
 
-#     # optimizer = Opt1(
-#     #     mutation_sigma=1.0, 
-#     #     verbose=True, 
-#     #     max_iter=500,
-#     #     population_size=3000,
-#     #     mutation_p_decay=0.995,
-#     # )
+#     optimizer = Opt1(
+#         mutation_sigma=1.0, 
+#         verbose=True, 
+#         max_iter=500,
+#         population_size=3000,
+#         mutation_p_decay=0.995,
+#     )
 
-#     # solutions, stats = optimizer.run(train.values)
 #     solutions, stats = log_opt(train,optimizer)
 
 #     # plot_hv(stats)
