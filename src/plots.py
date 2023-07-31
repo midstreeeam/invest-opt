@@ -8,6 +8,7 @@ import imageio
 
 
 from optfolio import YEAR_BARS
+from optfolio.returns_projection import *
 FILE_PATH = '../.data/'
 
 def plot_all_stock_daily_return(daily_returns):
@@ -176,6 +177,89 @@ def compare_solutions(solutions_lst, train, labels=None):
     plt.ylabel('Return')
     plt.show()
 
+def compare_sharpe(solutions_lst, train, labels=None):
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    plt.title('sharpe')
+
+    # Default color cycle
+    colors = plt.cm.jet(np.linspace(0, 1, len(solutions_lst)))
+
+    if labels is None:
+        labels = [f'Solution {i}' for i in range(len(solutions_lst))]
+
+    for idx, solutions in enumerate(solutions_lst):
+        solutions = np.array(solutions)
+        ov = annualized_portfolio_performance(train, solutions)
+        sharpe = ov[:, 0] / ov[:, 1]
+
+        ax.scatter(ov[:, 1], ov[:, 0], sharpe, color=colors[idx], label=labels[idx], alpha=.5)
+
+        print(f"\nsolution set {idx}: \n",
+              f"\tmean: {np.mean(sharpe)}\n",
+              f"\tstd: {np.std(sharpe)}\n",
+              f"\tbest: {sharpe.max()}\n",
+              f"\tworst: {sharpe.min()}\n"
+        )
+    
+    # Setting labels
+    ax.set_xlabel('Volatility')
+    ax.set_ylabel('Return')
+    ax.set_zlabel('Sharpe Ratio')
+    
+    # Displaying the plot
+    plt.show()
+
+def compare_density(solutions_lst, train, labels=None):
+    plt.figure()
+    plt.title('Density of Portfolio Returns for Different Solutions')
+
+    # Default color cycle
+    colors = plt.cm.jet(np.linspace(0, 1, len(solutions_lst)))
+
+    if labels is None:
+        labels = [f'Solution {i}' for i in range(len(solutions_lst))]
+
+    for idx, solutions in enumerate(solutions_lst):
+        ov = annualized_portfolio_performance(train, solutions)
+        solution = solutions[np.argmax(ov[:, 0] / ov[:, 1])]
+
+        ret = np.dot(train, solution)
+        sns.kdeplot(ret, color=colors[idx], label=labels[idx])
+
+    plt.legend(loc='upper right')
+    plt.xlabel('Returns')
+    plt.ylabel('Density')
+    plt.show()
+
+def run_mcmc(solutions_lst, train, labels=None):
+
+    traces_json = {}
+    fname = "../.data/traces.json"
+
+    if labels is None:
+        labels = [f'Solution {i}' for i in range(len(solutions_lst))]
+
+    for idx, solutions in enumerate(solutions_lst):
+        ov = annualized_portfolio_performance(train, solutions)
+        solution = solutions[np.argmax(ov[:, 0] / ov[:, 1])]
+
+        ret = np.dot(train, solution)
+        mcmc_traces = mcmc_sample_returns(ret, 10 * 252, n_traces=10000, mc_states=10, n_jobs=10)
+        traces_json[labels[idx]] = mcmc_traces.tolist()
+        # print(traces_json)
+
+    print('finish')
+    import time
+    time.sleep(10)
+    with open(fname, 'w', encoding='utf8') as f:
+        f.write(json.dumps(traces_json))
+
+def read_traces():
+    fname = "../.data/traces.json"
+    with open(fname, 'r', encoding='utf8') as f:
+        data = json.loads(f.read())
+    return data
 
 def read_log(path):
     with open(path, 'r', encoding='utf8') as f:

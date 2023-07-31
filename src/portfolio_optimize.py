@@ -49,21 +49,35 @@ spy_test = spy_daily_returns[(spy_daily_returns.index >= TRAIN_END_DATE)].fillna
 # plot_random_preformance(train)
 
 compare_files = [
-    # '../.data/3000_331iter.json',
+    '../.data/3000_331iter.json',
     # '../.data/3000_355iter.json',
     # '../.data/3000_362iter.json',
     # '../.data/3000_opt_374iter.json',
     # '../.data/3000_opt_416iter.json',
-    # '../.data/3000_opt_468iter.json',
-    '../.data/3000_opt2_387iter.json',
+    '../.data/3000_opt_468iter.json',
+    # '../.data/3000_opt2_387iter.json',
     '../.data/3000_opt2_411iter.json',
-    '../.data/3000_opt2_456iter.json',
+    # '../.data/3000_opt2_456iter.json',
 ]
 
 stats_lst, solutions_lst = zip(*[read_log(file) for file in compare_files])
 
-compare_hvs(stats_lst)
-compare_solutions(solutions_lst,train)
+labels = ['nsga-ii', 'select_opt', 'select_opt+dyn_mut+dyn_pop']
+args = {
+    'solutions_lst': solutions_lst,
+    'train': train,
+    'labels': labels
+}
+
+# add the '__main__' guard for multi-processing
+if __name__ == '__main__':
+    run_mcmc(**args)
+
+# compare_hvs(stats_lst)
+# compare_solutions(**args)
+# compare_sharpe(**args)
+# compare_density(**args)
+
 
 # for i in range(2):
 #     optimizer = Opt2(
@@ -91,14 +105,9 @@ compare_solutions(solutions_lst,train)
 #     # plot_solutions(train, solutions)
 
 
+# calculate dominance rate
 
-# # plot distributation
-# ov = annualized_portfolio_performance(train, solutions)
-# sharpe = ov[:, 0] / ov[:, 1]
-# # solution = solutions[np.argmin(np.abs(ov[:,1] - 0.16))]
-# solution = solutions[np.argmax(ov[:, 0] / ov[:, 1])]
-# print(solution)
-# annualized_portfolio_performance(train, solution)
+
 
 # CAPITAL = 38000
 
@@ -112,9 +121,6 @@ compare_solutions(solutions_lst,train)
 
 # ','.join(train.columns)
 
-# ret = np.dot(train, solution)
-# plt.hist(ret, bins=1000)
-# plt.show()
 
 
 # """### S&P 500 MC Projection"""
@@ -135,6 +141,6 @@ compare_solutions(solutions_lst,train)
 
 
 # """### MCMC Projection"""
-# mcmc_traces = mcmc_sample_returns(ret, 10 * 252, n_traces=100000, mc_states=10, n_jobs=10)
+# mcmc_traces = mcmc_sample_returns(ret, 10 * 252, n_traces=100000, mc_states=10, n_jobs=-1)
 # mcmc_cum_returns = plot_traces(mcmc_traces)
 # returns_table(mcmc_cum_returns)
