@@ -249,9 +249,6 @@ def run_mcmc(solutions_lst, train, labels=None):
         traces_json[labels[idx]] = mcmc_traces.tolist()
         # print(traces_json)
 
-    print('finish')
-    import time
-    time.sleep(10)
     with open(fname, 'w', encoding='utf8') as f:
         f.write(json.dumps(traces_json))
 
