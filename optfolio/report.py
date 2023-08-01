@@ -103,3 +103,59 @@ def returns_table(cum_returns):
     )
     df.set_index('Year', inplace=True)
     return df
+
+
+
+def plot_traces_compare(traces_lst, labels=None):
+    """
+    Plots boxplots of cumulative returns for a list of traces.
+
+    Args:
+    - traces_lst: List of arrays containing traces. 
+      Each array has shape (number of traces, number of data points).
+    - labels: List of strings to use as labels for the different traces.
+
+    Returns:
+    - cum_returns: Array of cumulative returns for the last trace.
+    """
+    # Default color cycle
+    colors = plt.cm.jet(np.linspace(0, 1, len(traces_lst)))
+    
+    if labels is None:
+        labels = [f'Solution {i}' for i in range(len(traces_lst))]
+
+    plt.figure(figsize=(20, 10))
+    
+    # Dummy lines for legend
+    legend_handles = []
+    
+    gap_between_groups = 1.5  # Control the gap between groups here
+
+    # Go through each trace and plot its boxplot
+    for i, traces in enumerate(traces_lst):
+        cum_returns = np.cumprod(traces + 1, axis=-1) - 1
+        box_data = cum_returns[:, 251::252]
+        
+        # Plot boxplots with specific positions to avoid overlap
+        positions = np.arange(1, box_data.shape[1] + 1) * gap_between_groups + i * 0.3  # Adjust gap here
+        boxplot_artist = plt.boxplot(box_data, positions=positions, widths=0.25,
+                                     patch_artist=True, showfliers=False, whis=[2.5, 97.5], 
+                                     boxprops=dict(facecolor=colors[i]))
+        
+        # Add the boxplot face color to the dummy legend
+        legend_handles.append(plt.Line2D([0], [0], color=colors[i], lw=4))
+
+    # Setting the x-axis ticks and labels
+    num_years = box_data.shape[1]
+    x_ticks = np.arange(1, num_years + 1) * gap_between_groups + (len(traces_lst) - 1) * 0.3 / 2  # Adjust gap here
+    plt.xticks(x_ticks, [str(i + 1) for i in range(num_years)])
+    
+    plt.xlabel('Year')
+    plt.ylabel('Return')
+    plt.axhline(0, color='black')
+    plt.legend(legend_handles, labels, loc='upper left')
+    
+    plt.tight_layout()
+    plt.show()
+
+    # return cum_returns
