@@ -1,3 +1,5 @@
 # invest-opt
 
-Currently it is a fork from [optfolio](https://github.com/marekgalovic/optfolio).
+A Fork from [optfolio](https://github.com/marekgalovic/optfolio).
+
+Using portfolio optimizatioin task to test an improved NSGA-II approach.
